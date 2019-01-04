@@ -39,12 +39,10 @@ function onOpen() {
   SpreadsheetApp.getUi()
   .createAddonMenu() // Add a new option in the Google Sheets Add-ons Menu
   .addItem("Générer", 'generate')
+  .addItem('Afficher les compétences', 'showSkillsSidebar')
   .addSeparator()
   .addItem("Intialiser", 'initialize')
   .addToUi();
 }
 
 /******************************/
-
-
-

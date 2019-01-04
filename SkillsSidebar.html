@@ -1,0 +1,289 @@
+<style>
+
+#sort {
+	text-align: center;
+}
+
+#skills {
+	margin: 0 5px;
+}
+
+
+/* General button style (reset) */
+
+.btn {
+	border: none;
+	color: inherit;
+	background: none;
+	cursor: pointer;
+	padding: 5px 10px;
+	display: inline-block;
+	margin: 2px 1px;
+	outline: none;
+	position: relative;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;
+	font-size: 14px;
+	-webkit-transition: none;
+	-moz-transition: none;
+	transition: none;
+	background: #e4e4e4;
+	box-shadow: 0 2px #b5b5b5;
+	border-radius: 0 0 2px 2px;
+}
+
+.btn:hover {
+	background: #d8d8d8;
+}
+
+.btn:active {
+	box-shadow: 0 1px #a0a0a0;
+	top: 2px;
+}
+
+.control {
+	display: inline-block;
+	position: relative;
+	padding-left: 30px;
+	margin: 5px 10px 15px 10px;
+	cursor: pointer;
+	font-size: 15px;
+	font-family: Arial;
+}
+
+.control input {
+	position: absolute;
+	z-index: -1;
+	opacity: 0;
+}
+
+.control__indicator {
+	position: absolute;
+	top: -1px;
+	left: 0;
+	height: 20px;
+	width: 20px;
+	background: #e6e6e6;
+}
+
+.control--radio .control__indicator {
+	border-radius: 50%;
+}
+
+.control:hover input~.control__indicator,
+.control input:focus~.control__indicator {
+	background: #ccc;
+}
+
+.control input:checked~.control__indicator {
+	background: #9a9a9a;
+}
+
+.control:hover input:not([disabled]):checked~.control__indicator,
+.control input:checked:focus~.control__indicator {
+	background: #9a9a9a;
+}
+
+.control input:disabled~.control__indicator {
+	background: #e6e6e6;
+	opacity: 0.6;
+	pointer-events: none;
+}
+
+.control__indicator:after {
+	content: '';
+	position: absolute;
+	display: none;
+}
+
+.control input:checked~.control__indicator:after {
+	display: block;
+}
+
+.control--checkbox .control__indicator:after {
+	left: 8px;
+	top: 4px;
+	width: 3px;
+	height: 8px;
+	border: solid #fff;
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
+}
+
+.control--checkbox input:disabled~.control__indicator:after {
+	border-color: #7b7b7b;
+}
+
+.control--radio .control__indicator:after {
+	left: 7px;
+	top: 7px;
+	height: 6px;
+	width: 6px;
+	border-radius: 50%;
+	background: #fff;
+}
+
+.control--radio input:disabled~.control__indicator:after {
+	background: #7b7b7b;
+}
+
+.select {
+	position: relative;
+	display: inline-block;
+	margin-bottom: 15px;
+	width: 100%;
+}
+
+.select select {
+	display: inline-block;
+	width: 100%;
+	cursor: pointer;
+	padding: 10px 15px;
+	outline: 0;
+	border: 0;
+	border-radius: 0;
+	background: #e6e6e6;
+	color: #7b7b7b;
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+
+.select select::-ms-expand {
+	display: none;
+}
+
+.select select:hover,
+.select select:focus {
+	color: #000;
+	background: #ccc;
+}
+
+.select select:disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.select__arrow {
+	position: absolute;
+	top: 16px;
+	right: 15px;
+	width: 0;
+	height: 0;
+	pointer-events: none;
+	border-style: solid;
+	border-width: 8px 5px 0 5px;
+	border-color: #7b7b7b transparent transparent transparent;
+}
+
+.select select:hover~.select__arrow,
+.select select:focus~.select__arrow {
+	border-top-color: #000;
+}
+
+.select select:disabled~.select__arrow {
+	border-top-color: #ccc;
+}
+
+</style>
+
+
+
+
+
+<script>
+// Get data from backend
+var data = << ? != JSON.stringify(dataFromServerTemplate) ? > ;
+
+// param : array (key --> value)
+// return : array (key) but sorted with by values
+// https://stackoverflow.com/questions/5199901/how-to-sort-an-associative-array-by-its-values-in-javascript/11811767
+function getSortedKeys(obj) {
+	var keys = [];
+	for (var key in obj) keys.push(key);
+	return keys.sort(function (a, b) {
+		return obj[b] - obj[a]
+	});
+}
+
+function escapeHtml(str) {
+	return str
+		.replace(/&/g, "&")
+		.replace(/</g, "<")
+		.replace(/>/g, ">")
+		.replace(/"/g, """)
+		.replace(/'/g, "'");
+}
+
+// escape in javascript
+function addslashes(str) {
+	return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
+};
+
+
+function initialize() {
+	var skills = data.skills;
+	var sortSkillsByOcurrences = Object.keys(skills);
+	var sortSkillsByAlphabetic = sortSkillsByOcurrences.slice().sort();
+	var all_skills = document.getElementById("skills");
+
+	displaySort(all_skills, sortSkillsByOcurrences);
+    
+    // Get value of radio button and set an event
+	var rad = document.sortForm.sortRadio;
+	var prev = null;
+	for (var i = 0; i < rad.length; i++) {
+		rad[i].addEventListener('change', function () {
+			//(prev)? console.log(prev.value):null;
+			if (this !== prev) {
+				prev = this;
+			}
+			var sortArray = [];
+
+			if (this.value == 1) {
+				displaySort(all_skills, sortSkillsByOcurrences);
+			} else {
+				displaySort(all_skills, sortSkillsByAlphabetic);
+			}
+
+		});
+	}
+    
+    // display buttons ordered by sortArray
+	function displaySort(el, sortArray) {
+		all_skills.innerHTML = "";
+		for (var i = 0, len = sortSkillsByOcurrences.length; i < len; i++) {
+			all_skills.insertAdjacentHTML('beforeend', '<input type="button" class="btn" value="' + escapeHtml(sortArray[i]) + '" onclick="google.script.run.addSkillInselectedCells(\'' + escapeHtml(addslashes(sortArray[i])) + '\');"/><br>');
+		}
+
+	}
+
+}
+
+
+window.onload = initialize;
+
+
+</script>
+
+<div>
+   <div id="sort" style="">
+      <form name="sortForm">
+         <label class="control control--radio">
+            Occurence
+            <input type="radio" name="sortRadio" checked="checked" value="1"/>
+            <div class="control__indicator"></div>
+         </label>
+         <label class="control control--radio">
+            Ordre alpha.
+            <input type="radio" name="sortRadio" value="2"/>
+            <div class="control__indicator"></div>
+         </label>
+      </form>
+   </div>
+   <div id="skills" style=""></div>
+</div>
+
+
+
