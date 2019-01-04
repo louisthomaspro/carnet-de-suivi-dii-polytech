@@ -194,7 +194,7 @@
 
 <script>
 // Get data from backend
-var data = << ? != JSON.stringify(dataFromServerTemplate) ? > ;
+var data = <?!= JSON.stringify(dataFromServerTemplate) ?>;
 
 // param : array (key --> value)
 // return : array (key) but sorted with by values
@@ -209,11 +209,11 @@ function getSortedKeys(obj) {
 
 function escapeHtml(str) {
 	return str
-		.replace(/&/g, "&")
-		.replace(/</g, "<")
-		.replace(/>/g, ">")
-		.replace(/"/g, """)
-		.replace(/'/g, "'");
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
 }
 
 // escape in javascript
