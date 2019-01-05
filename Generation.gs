@@ -7,62 +7,69 @@
 
 
 /**
- * Generate the tracking book
- */
+* Generate the tracking book
+*/
 function generate() {
   
-  var ui = SpreadsheetApp.getUi();
-  var folder = getFolderOfFileId(SpreadsheetApp.getActiveSpreadsheet().getId()); // get parent folder of the spreadsheet
-  var template = getFileByNameInFolder('_template', folder); // get Gdocs '_template'
-  
-  // File not initialized ?
-  if (template==0) {
-    ui.alert("Impossible de générer le carnet de suivi : fichier '_template' manquant. Réinitialisez votre projet !");
-    return 0;
-  }
-  if (SpreadsheetApp.getActiveSpreadsheet().getSheets().length < 2) {
-    ui.alert("Impossible de générer le carnet de suivi : Google Sheets non initialisé. Réinitialisez votre projet !");
-    return 0;
-  }
-  
-  var ts_begin = new Date().getTime(); // Number of ms since Jan 1, 1970
-  CacheService.getUserCache().put('ts_begin', JSON.stringify(ts_begin));
-  
-  deleteFileByNameInFolder('_generated', folder); // delete all Gdocs '_generated' existing
-  
-  // create a copy of Gdocs '_template' and rename to '_generated'
-  var file = template.makeCopy().setName('_generated');
-  var generated = DocumentApp.openById(file.getId()); // get Gdocs '_generated' DocumentApp
-  
-  // Replace scopes
-  add_period(generated, "school");
-  add_period(generated, "company");
-  add_table(generated, "end_of_course");
-  
-  
-  // Calculation of the execution time of the function
-  var ts_begin = getJsonCache('ts_begin');
-  var ts_end = new Date().getTime();
-  var time = (ts_end - ts_begin) / 1000;
-  
-  var htmlOutput = HtmlService
-  .createHtmlOutput('Lien du fichier : <a target="_blank" href="https://docs.google.com/document/d/' + file.getId() + '/edit">\'_generated\'</a>' +
-    '<br><span style="font-size:12px;color:#797979;">Time : ' + JSON.stringify(time) + 's</span>')
-  .setWidth(250)
-  .setHeight(50);
-  SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Carnet de suivi généré !');
+  try {
     
+    var ui = SpreadsheetApp.getUi();
+    var folder = getFolderOfFileId(SpreadsheetApp.getActiveSpreadsheet().getId()); // get parent folder of the spreadsheet
+    var template = getFileByNameInFolder('_template', folder); // get Gdocs '_template'
+    
+    // File not initialized ?
+    if (template==0) {
+      ui.alert("Impossible de générer le carnet de suivi : fichier '_template' manquant. Réinitialisez votre projet !");
+      return 0;
+    }
+    if (SpreadsheetApp.getActiveSpreadsheet().getSheets().length < 2) {
+      ui.alert("Impossible de générer le carnet de suivi : Google Sheets non initialisé. Réinitialisez votre projet !");
+      return 0;
+    }
+    
+    var ts_begin = new Date().getTime(); // Number of ms since Jan 1, 1970
+    CacheService.getUserCache().put('ts_begin', JSON.stringify(ts_begin));
+    
+    deleteFileByNameInFolder('_generated', folder); // delete all Gdocs '_generated' existing
+    
+    // create a copy of Gdocs '_template' and rename to '_generated'
+    var file = template.makeCopy().setName('_generated');
+    var generated = DocumentApp.openById(file.getId()); // get Gdocs '_generated' DocumentApp
+    
+    // Replace scopes
+    add_period(generated, "school");
+    add_period(generated, "company");
+    add_table(generated, "end_of_course");
+    
+    
+    // Calculation of the execution time of the function
+    var ts_begin = getJsonCache('ts_begin');
+    var ts_end = new Date().getTime();
+    var time = (ts_end - ts_begin) / 1000;
+    
+    var htmlOutput = HtmlService
+    .createHtmlOutput('Lien du fichier : <a target="_blank" href="https://docs.google.com/document/d/' + file.getId() + '/edit">\'_generated\'</a>' +
+      '<br><span style="font-size:12px;color:#797979;">Time : ' + JSON.stringify(time) + 's</span>')
+      .setWidth(250)
+      .setHeight(50);
+    SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Carnet de suivi généré !');
+    
+  } catch (e) {
+    console.error(e.message + e.stack);
+    SpreadsheetApp.getUi().alert('Impossible de générer le carnet de suivi. Merci de reporter l\'erreur "Carnet de suivi DII > Help > Report an issue".');
+  }
+  
 }
 
 
 /**
- * Generate the period in the doc
- * This function insert table by table always at the same index. We begin by the end of the period.
- *
- * @param doc {documentApp} destination
- * @param period {string} selected period
- * @return {Nothing}
- */
+* Generate the period in the doc
+* This function insert table by table always at the same index. We begin by the end of the period.
+*
+* @param doc {documentApp} destination
+* @param period {string} selected period
+* @return {Nothing}
+*/
 function add_period(doc, period) {
   
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(period);
@@ -104,7 +111,7 @@ function add_period(doc, period) {
       end_week_number = row[0]; // save end_week_number to update synthese value after
       
     } else { // not synthese
-    
+      
       if (week_number != row[0]) { // if we changed week we add a new table
         
         week_number = row[0];
@@ -135,7 +142,7 @@ function add_period(doc, period) {
       tablerow.appendTableCell(row[2]);
       tablerow.appendTableCell(row[3]);
       tablerow.appendTableCell(row[4]);
-     
+      
     } // add table
     
   } // end for
@@ -143,12 +150,12 @@ function add_period(doc, period) {
 }
 
 /**
- * Generate a simple table in the doc with a header and 2 column
- *
- * @param doc {documentApp} destination
- * @param period {string} selected period
- * @return {Nothing}
- */
+* Generate a simple table in the doc with a header and 2 column
+*
+* @param doc {documentApp} destination
+* @param period {string} selected period
+* @return {Nothing}
+*/
 function add_table(doc, period) {
   
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(period);

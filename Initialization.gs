@@ -2,8 +2,8 @@
 
 
 /**
- * Main initialize function : ask for initialization and call other initializing functions
- */
+* Main initialize function : ask for initialization and call other initializing functions
+*/
 function initialize() {
   
   var ui = SpreadsheetApp.getUi();
@@ -14,19 +14,26 @@ function initialize() {
                           ui.ButtonSet.YES_NO);
   
   if (response == ui.Button.YES) {
-    setInFolder();
-    initGsheets();
-    downloadGdocsTemplate();
-    ui.alert("Carnet de suivi initialisé ! Vous pouvez maintenant tester la génération du carnet de suivi dans :\n" +
-            "\"Modules complémentaires > Carnet de suivi DII > Générer\"");
+    
+    try {
+      setInFolder();
+      initGsheets();
+      downloadGdocsTemplate();
+      ui.alert("Carnet de suivi initialisé ! Vous pouvez maintenant tester la génération du carnet de suivi dans :\n" +
+               "\"Modules complémentaires > Carnet de suivi DII > Générer\"");
+      
+    } catch (e) {
+      console.error(e.message + e.stack);
+      SpreadsheetApp.getUi().alert('Impossible d\'initialiser le carnet de suivi. Merci de reporter l\'erreur "Carnet de suivi DII > Help > Report an issue".');
+    }
     
   }
 }
 
 
 /**
- * Create a folder named 'Carnet de suivi DII' in the parent folder and move the Gsheets in
- */
+* Create a folder named 'Carnet de suivi DII' in the parent folder and move the Gsheets in
+*/
 function setInFolder() {
   // Create new folder in parent folder
   var parentfolder = getFolderOfFileId(SpreadsheetApp.getActiveSpreadsheet().getId()); // get parent folder of the spreadsheet
@@ -40,10 +47,10 @@ function setInFolder() {
 
 
 /**
- * Initialize template of the Gsheets (periods, end_of_course, filter...)
- */
+* Initialize template of the Gsheets (periods, end_of_course, filter...)
+*/
 function initGsheets() {
- 
+  
   var destinationSheet = SpreadsheetApp.getActive();
   var sourceSheet = SpreadsheetApp.openById(SHEET_SOURCE);
   
@@ -74,15 +81,15 @@ function initGsheets() {
   destinationSheet.setActiveSheet(destinationSheet.getSheetByName('school'));
   
   destinationSheet.deleteSheet(blank_sheet); // Delete active sheet saved
-
+  
 };
 
 
 /**
- * Initialize/replace the Google Doc template. Delete all files named '_template' and download official files '_template'
- */
+* Initialize/replace the Google Doc template. Delete all files named '_template' and download official files '_template'
+*/
 function downloadGdocsTemplate() {
-    
+  
   var template = DriveApp.getFileById(DOC_SOURCE); // get official template file
   var parentFolder = getFolderOfFileId(SpreadsheetApp.getActiveSpreadsheet().getId()); // get parent folder of the spreadsheet
   
