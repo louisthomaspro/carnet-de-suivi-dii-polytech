@@ -3,7 +3,7 @@
 */
 function showSkillsSidebar() {
   
-  running("showSkillsSidebar");
+  logActivity("showSkillsSidebar()");
   
   try {
     
@@ -28,11 +28,11 @@ function showSkillsSidebar() {
     var htmlTemplate = HtmlService.createTemplateFromFile('SkillsSidebar')
     htmlTemplate.dataFromServerTemplate = { skills: skills };
     var htmlOutput = htmlTemplate.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME).setTitle('Compétences').setWidth(300);
-    SpreadsheetApp.getUi().showSidebar(htmlOutput);
+    ui.showSidebar(htmlOutput);
     
   } catch (e) {
-    console.error(e.message + e.stack);
-    SpreadsheetApp.getUi().alert('Impossible d\'afficher les compétences, veuillez vérifier que votre carnet de suivi a bien été initialisé. ' + ERROR_REPORT);
+    logError(e);
+    ui.alert('Impossible d\'afficher les compétences, veuillez vérifier que votre carnet de suivi a bien été initialisé. ' + ERROR_REPORT);
   }
 }
 
@@ -40,6 +40,8 @@ function showSkillsSidebar() {
 * Action on click for buttons in side bar : we append the skill in the selected cell
 */
 function addSkillInselectedCells(text) {
+  
+  logActivity("addSkillInselectedCells()");
   
   try {
     
@@ -59,8 +61,8 @@ function addSkillInselectedCells(text) {
     }
     
   } catch (e) {
-    console.error(e.message + e.stack);
-    SpreadsheetApp.getUi().alert('Impossible d\'ajouter la compétence. ' + ERROR_REPORT);
+    logError(e);
+    ui.alert('Impossible d\'ajouter la compétence. ' + ERROR_REPORT);
   }
   
   

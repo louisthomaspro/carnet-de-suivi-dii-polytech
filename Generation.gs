@@ -11,11 +11,10 @@
 */
 function generate() {
   
-  running("generate");
+  logActivity("generate()");
   
   try {
     
-    var ui = SpreadsheetApp.getUi();
     var folder = getFolderOfFileId(SpreadsheetApp.getActiveSpreadsheet().getId()); // get parent folder of the spreadsheet
     var template = getFileByNameInFolder('_template', folder); // get Gdocs '_template'
     
@@ -44,11 +43,11 @@ function generate() {
       '<br><span style="font-size:12px;color:#797979;">Time : ' + JSON.stringify(time) + 's</span>')
       .setWidth(250)
       .setHeight(50);
-    SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Carnet de suivi généré !');
+    ui.showModalDialog(htmlOutput, 'Carnet de suivi généré !');
     
   } catch (e) {
-    console.error(e.message + e.stack);
-    SpreadsheetApp.getUi().alert('Impossible de générer le carnet de suivi. Vérifiez que votre carnet de suivi a bien était initialisé. ' + ERROR_REPORT);
+    logError(e);
+    ui.alert('Impossible de générer le carnet de suivi. Vérifiez que votre carnet de suivi a bien était initialisé. ' + ERROR_REPORT);
   }
   
 }

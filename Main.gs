@@ -23,6 +23,12 @@ var TABLE_SOURCE = '1j_WQbZ0p0nSnbF1d-VtYtKxmn6R0LIL7KohZY9-b4XE'; // https://do
 
 var ERROR_REPORT = 'Si le problème persiste, merci de reporter l\'erreur dans "Carnet de suivi DII Polytech > Help > Report an issue".';
 
+
+var ui = SpreadsheetApp.getUi();
+var documentProperties = PropertiesService.getDocumentProperties();
+var scriptProperties = PropertiesService.getScriptProperties();
+var userProperties = PropertiesService.getUserProperties();
+
 /******************************/
 
 
@@ -38,14 +44,14 @@ function onInstall() {
 
 // When the Gsheet has just been opened
 function onOpen() {
-  SpreadsheetApp.getUi()
+  ui
   .createAddonMenu() // Add a new option in the Google Sheets Add-ons Menu
   .addItem("Générer", 'generate')
   .addItem('Afficher les compétences', 'showSkillsSidebar')
   .addSeparator()
   .addItem("Intialiser", 'initialize')
   .addToUi();
+  
 }
 
 /******************************/
-

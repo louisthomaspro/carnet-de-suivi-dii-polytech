@@ -6,9 +6,9 @@
 */
 function initialize() {
   
-  running("initialize");
+  logActivity("initialize()");
   
-  var ui = SpreadsheetApp.getUi();
+  
   var response = ui.alert("Voulez-vous initialiser tout votre carnet suivi maintenant ?\n" +
                           "Un dossier nommé 'Carnet de suivi DII' sera généré. Dedans :\n" +
                           "- Ce Google Sheets sera initialisé\n" +
@@ -25,8 +25,8 @@ function initialize() {
                "\"Modules complémentaires > Carnet de suivi DII Polytech > Générer\"");
       
     } catch (e) {
-      console.error(e.message + e.stack);
-      SpreadsheetApp.getUi().alert('Impossible d\'initialiser le carnet de suivi. ' + ERROR_REPORT);
+      logError(e);
+      ui.alert('Impossible d\'initialiser le carnet de suivi. ' + ERROR_REPORT);
     }
     
   }

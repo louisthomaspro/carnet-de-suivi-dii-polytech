@@ -4,12 +4,36 @@
 
 
 /**
- * Log temporary active user key and the function name
+ * Log an activity and store in database
  *
  * @param name {String} function name
  */
-function running(name) {
-  console.log("user: " + Session.getTemporaryActiveUserKey() + " | function: " + name + "()");
+function logActivity(desc) {
+  const data = {
+    "user": Session.getTemporaryActiveUserKey(),
+    "desc" : desc,
+    "date" : new Date()
+  }
+  var firestore = getDatabase();
+  firestore.createDocument("Activity", data);
+  console.log(data);
+}
+
+
+/**
+ * Log an error and store in database
+ *
+ * @param name {String} function name
+ */
+function logError(e) {
+  const data = {
+    "user": Session.getTemporaryActiveUserKey(),
+    "desc" : e,
+    "date" : new Date()
+  }
+  var firestore = getDatabase();
+  firestore.createDocument("Error", data);
+  console.error(e.message + e.stack);
 }
 
 
