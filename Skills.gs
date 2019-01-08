@@ -3,6 +3,7 @@
 */
 function showSkillsSidebar() {
   
+  running("showSkillsSidebar");
   
   try {
     
@@ -31,7 +32,7 @@ function showSkillsSidebar() {
     
   } catch (e) {
     console.error(e.message + e.stack);
-    SpreadsheetApp.getUi().alert('Impossible d\'afficher les compétences, veuillez vérifier que votre carnet de suivi a bien était initialisé.');
+    SpreadsheetApp.getUi().alert('Impossible d\'afficher les compétences, veuillez vérifier que votre carnet de suivi a bien été initialisé. ' + ERROR_REPORT);
   }
 }
 
@@ -59,7 +60,7 @@ function addSkillInselectedCells(text) {
     
   } catch (e) {
     console.error(e.message + e.stack);
-    SpreadsheetApp.getUi().alert('Impossible d\'ajouter la compétence. Merci de reporter l\'erreur "Carnet de suivi DII > Help > Report an issue".');
+    SpreadsheetApp.getUi().alert('Impossible d\'ajouter la compétence. ' + ERROR_REPORT);
   }
   
   

@@ -11,21 +11,13 @@
 */
 function generate() {
   
+  running("generate");
+  
   try {
     
     var ui = SpreadsheetApp.getUi();
     var folder = getFolderOfFileId(SpreadsheetApp.getActiveSpreadsheet().getId()); // get parent folder of the spreadsheet
     var template = getFileByNameInFolder('_template', folder); // get Gdocs '_template'
-    
-    // File not initialized ?
-    if (template==0) {
-      ui.alert("Impossible de générer le carnet de suivi : fichier '_template' manquant. Réinitialisez votre projet !");
-      return 0;
-    }
-    if (SpreadsheetApp.getActiveSpreadsheet().getSheets().length < 2) {
-      ui.alert("Impossible de générer le carnet de suivi : Google Sheets non initialisé. Réinitialisez votre projet !");
-      return 0;
-    }
     
     var ts_begin = new Date().getTime(); // Number of ms since Jan 1, 1970
     CacheService.getUserCache().put('ts_begin', JSON.stringify(ts_begin));
@@ -56,7 +48,7 @@ function generate() {
     
   } catch (e) {
     console.error(e.message + e.stack);
-    SpreadsheetApp.getUi().alert('Impossible de générer le carnet de suivi. Merci de reporter l\'erreur "Carnet de suivi DII > Help > Report an issue".');
+    SpreadsheetApp.getUi().alert('Impossible de générer le carnet de suivi. Vérifiez que votre carnet de suivi a bien était initialisé. ' + ERROR_REPORT);
   }
   
 }

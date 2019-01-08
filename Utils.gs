@@ -2,6 +2,17 @@
 
 ///////////////////////////// SHORT FONCTIONS /////////////////////////////
 
+
+/**
+ * Log temporary active user key and the function name
+ *
+ * @param name {String} function name
+ */
+function running(name) {
+  console.log("user: " + Session.getTemporaryActiveUserKey() + " | function: " + name + "()");
+}
+
+
 /**
  * Returns parent folder of the file id. Returns 0 if not found
  *
@@ -11,13 +22,8 @@
 function getFolderOfFileId(id) {
   var current_file = DriveApp.getFileById(id); // get current file
   var parent_folders = current_file.getParents(); // get all parent folders
-  if (!parent_folders.hasNext()) { // if no parent
-    Logger.log("File id '" + id + "' have no parent folder.");
-    return 0;
-  }
   var folder = parent_folders.next(); // get closest parent folder
-  var folder_id = folder.getId(); // get folder id
-  return DriveApp.getFolderById(folder_id);
+  return folder;
 }
 
 
