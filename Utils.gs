@@ -9,14 +9,18 @@
  * @param name {String} function name
  */
 function logActivity(desc) {
-  const data = {
-    "user": Session.getTemporaryActiveUserKey(),
-    "desc" : desc,
-    "date" : new Date()
+  try {
+    const data = {
+      "user": Session.getTemporaryActiveUserKey(),
+      "desc" : desc,
+      "date" : new Date()
+    }
+    var firestore = getDatabase();
+    firestore.createDocument("Activity", data);
+    console.log(data);
+  } catch (e) {
+    console.error(e);
   }
-  var firestore = getDatabase();
-  firestore.createDocument("Activity", data);
-  console.log(data);
 }
 
 
@@ -25,15 +29,19 @@ function logActivity(desc) {
  *
  * @param name {String} function name
  */
-function logError(e) {
-  const data = {
-    "user": Session.getTemporaryActiveUserKey(),
-    "desc" : e,
-    "date" : new Date()
+function logError(err) {
+  try {
+    const data = {
+      "user": Session.getTemporaryActiveUserKey(),
+      "desc" : err,
+      "date" : new Date()
+    }
+    var firestore = getDatabase();
+    firestore.createDocument("Error", data);
+    console.error(err.message + err.stack);
+  } catch (e) {
+    console.error(e);
   }
-  var firestore = getDatabase();
-  firestore.createDocument("Error", data);
-  console.error(e.message + e.stack);
 }
 
 
