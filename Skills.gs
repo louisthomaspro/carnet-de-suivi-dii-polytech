@@ -1,14 +1,16 @@
+// Skills.gs
+
+
 /**
 * Show sidebar with skills
 */
 function showSkillsSidebar() {
-  
-  logActivity("showSkillsSidebar()");
+  sendClickEvent();
   
   try {
     
     // First we get all skills with their occurences
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('company');
+    var sheet = getSheetByName('company');
     var rows = sheet.getRange("E2:E").getValues(); // get all skills already added
     var filter_rows = [i for each (i in rows)if (isNaN(i))]; // remove empty values
     var skills = new Object(); // will contain all skills with their occurences
@@ -29,19 +31,17 @@ function showSkillsSidebar() {
     htmlTemplate.dataFromServerTemplate = { skills: skills };
     var htmlOutput = htmlTemplate.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME).setTitle('Compétences').setWidth(300);
     ui.showSidebar(htmlOutput);
-    
+
   } catch (e) {
-    logError(e);
-    ui.alert('Impossible d\'afficher les compétences, veuillez vérifier que votre carnet de suivi a bien été initialisé. ' + ERROR_REPORT);
+    handleError("Impossible d\'afficher les compétences. ", e, "Vérifiez que votre carnet de suivi a bien été initialisé. ");
   }
 }
 
 /**
 * Action on click for buttons in side bar : we append the skill in the selected cell
 */
-function addSkillInselectedCells(text) {
-  
-  logActivity("addSkillInselectedCells()");
+function addSkillInSelectedCells(text) {
+  sendClickEvent(text);
   
   try {
     
@@ -61,8 +61,7 @@ function addSkillInselectedCells(text) {
     }
     
   } catch (e) {
-    logError(e);
-    ui.alert('Impossible d\'ajouter la compétence. ' + ERROR_REPORT);
+    handleError("Impossible d'ajouter la compétence. ", e, "");
   }
   
   

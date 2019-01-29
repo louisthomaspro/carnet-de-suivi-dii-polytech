@@ -254,7 +254,7 @@ function initialize() {
 	function displaySort(el, sortArray) {
 		all_skills.innerHTML = "";
 		for (var i = 0, len = sortSkillsByOcurrences.length; i < len; i++) {
-			all_skills.insertAdjacentHTML('beforeend', '<input type="button" class="btn" value="' + escapeHtml(sortArray[i]) + '" onclick="google.script.run.addSkillInselectedCells(\'' + escapeHtml(addslashes(sortArray[i])) + '\');"/><br>');
+			all_skills.insertAdjacentHTML('beforeend', '<input type="button" class="btn" value="' + escapeHtml(sortArray[i]) + '" onclick="google.script.run.addSkillInSelectedCells(\'' + escapeHtml(addslashes(sortArray[i])) + '\');"/><br>');
 		}
 
 	}

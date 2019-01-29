@@ -1,4 +1,9 @@
- 
+// Database.gs
+
+
+/**
+ * Connect to firestore database and return an object
+ */
 function getDatabase() {
   
   // https://github.com/grahamearley/FirestoreGoogleAppsScript

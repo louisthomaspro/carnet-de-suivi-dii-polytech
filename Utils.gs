@@ -1,47 +1,61 @@
 // Utils.gs
 
+
 ///////////////////////////// SHORT FONCTIONS /////////////////////////////
 
 
 /**
- * Log an activity and store in database
+ * Return the function name of the caller
  *
- * @param name {String} function name
+ * @param n {String} n th parent. (ex : n=1 will be the function where getCaller is called)
  */
-function logActivity(desc) {
-  try {
-    const data = {
-      "user": Session.getTemporaryActiveUserKey(),
-      "desc" : desc,
-      "date" : new Date()
-    }
-    var firestore = getDatabase();
-    firestore.createDocument("Activity", data);
-    console.log(data);
-  } catch (e) {
-    console.error(e);
+function getCaller(n)
+{
+  var nth = 2; 
+  if (n !== undefined) {
+    nth = nth + n;
   }
+  var stack;
+  var ret = "";
+    try {
+      throw new Error("Whoops!");
+    } catch (e) {
+      stack = e.stack;
+    } finally {
+      var matchArr = stack.match(/\(.*\)/g);
+      if (matchArr.length > 2) {
+        tmp = matchArr[nth];
+        ret = tmp.slice(1, tmp.length - 1) + "()";
+      }
+      return ret;
+    }
 }
 
 
 /**
- * Log an error and store in database
+ * Return true if the string in parameter can be parsed
  *
- * @param name {String} function name
+ * @param str {String} test if this variable can be parsed
  */
-function logError(err) {
+function isJson(str) {
   try {
-    const data = {
-      "user": Session.getTemporaryActiveUserKey(),
-      "desc" : err,
-      "date" : new Date()
-    }
-    var firestore = getDatabase();
-    firestore.createDocument("Error", data);
-    console.error(err.message + err.stack);
+    JSON.parse(str);
   } catch (e) {
-    console.error(e);
+    return false;
   }
+  return true;
+}
+
+
+/**
+ * Return the length of the variable after UTF-8 encoding
+ *
+ * @param str {String} we want to calcul the length of this variable
+ */
+function lengthInUtf8Bytes(str) {
+  // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
+  var m = encodeURIComponent(str).match(/%[89ABab]/g);
+  return str.length + (m ? m.length : 0);
 }
 
 
@@ -69,8 +83,8 @@ function getFolderOfFileId(id) {
 function getFileByNameInFolder(name, folder) {
   var files = folder.getFilesByName(name); // get all files named 'name' in folder
   if (!files.hasNext()) { // if not found
-    Logger.log("File named '" + name + "' can't be found in folder.");
-    return 0;
+    throw new Error(customError('Le fichier nommé "' + name + '" est introuvable dans le dossier "' + folder.getName() + '". ' +
+                    'Pour rappel, ce fichier ne doit pas être renommé ou déplacé. '));
   }
   var file = files.next();
   return file
@@ -84,7 +98,7 @@ function getFileByNameInFolder(name, folder) {
  * @param folder {Folder} folder where we looking
  * @return {Nothing}
  */
-function deleteFileByNameInFolder(name, folder) {
+function deleteFilesByNameInFolder(name, folder) {
   var files = folder.getFilesByName(name); // get all files named 'name' in folder
   while (files.hasNext()) { // for each files
     files.next().setTrashed(true); // send file to trash

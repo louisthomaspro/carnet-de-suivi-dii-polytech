@@ -5,9 +5,7 @@
 * Main initialize function : ask for initialization and call other initializing functions
 */
 function initialize() {
-  
-  logActivity("initialize()");
-  
+    
   
   var response = ui.alert("Voulez-vous initialiser tout votre carnet suivi maintenant ?\n" +
                           "Un dossier nommé 'Carnet de suivi DII' sera généré. Dedans :\n" +
@@ -17,6 +15,7 @@ function initialize() {
   
   if (response == ui.Button.YES) {
     
+    
     try {
       setInFolder();
       initGsheets();
@@ -24,8 +23,9 @@ function initialize() {
       ui.alert("Carnet de suivi initialisé ! Vous pouvez maintenant tester la génération du carnet de suivi dans :\n" +
                "\"Modules complémentaires > Carnet de suivi DII Polytech > Générer\"");
       
+      sendUxClickGaEvent("initialize()");
     } catch (e) {
-      logError(e);
+      sendUxClickGaEvent("initialize()", JSON.stringify(e));
       ui.alert('Impossible d\'initialiser le carnet de suivi. ' + ERROR_REPORT);
     }
     
@@ -53,7 +53,7 @@ function setInFolder() {
 */
 function initGsheets() {
   
-  var destinationSheet = SpreadsheetApp.getActive();
+  var destinationSheet = SpreadsheetApp.getActiveSpreadsheet();
   var sourceSheet = SpreadsheetApp.openById(SHEET_SOURCE);
   
   destinationSheet.rename("Périodes");
@@ -78,9 +78,9 @@ function initGsheets() {
   }
   
   // Move filter sheet at the end
-  destinationSheet.setActiveSheet(destinationSheet.getSheetByName('filter'));
+  destinationSheet.setActiveSheet(getSheetByName('filter'));
   destinationSheet.moveActiveSheet(destinationSheet.getSheets().length);
-  destinationSheet.setActiveSheet(destinationSheet.getSheetByName('school'));
+  destinationSheet.setActiveSheet(getSheetByName('school'));
   
   destinationSheet.deleteSheet(blank_sheet); // Delete active sheet saved
   

@@ -1,18 +1,17 @@
 // Generation.gs
 
+
 // GENERATE THE TRACKING BOOK
 // Delete all files names '_generated'
 // Copy '_template' file rename to '_generated' and add data from Gsheets
-// 
 
 
 /**
 * Generate the tracking book
 */
 function generate() {
-  
-  logActivity("generate()");
-  
+  sendClickEvent();
+   
   try {
     
     var folder = getFolderOfFileId(SpreadsheetApp.getActiveSpreadsheet().getId()); // get parent folder of the spreadsheet
@@ -21,7 +20,7 @@ function generate() {
     var ts_begin = new Date().getTime(); // Number of ms since Jan 1, 1970
     CacheService.getUserCache().put('ts_begin', JSON.stringify(ts_begin));
     
-    deleteFileByNameInFolder('_generated', folder); // delete all Gdocs '_generated' existing
+    deleteFilesByNameInFolder('_generated', folder); // delete all Gdocs '_generated' existing
     
     // create a copy of Gdocs '_template' and rename to '_generated'
     var file = template.makeCopy().setName('_generated');
@@ -46,8 +45,7 @@ function generate() {
     ui.showModalDialog(htmlOutput, 'Carnet de suivi généré !');
     
   } catch (e) {
-    logError(e);
-    ui.alert('Impossible de générer le carnet de suivi. Vérifiez que votre carnet de suivi a bien était initialisé. ' + ERROR_REPORT);
+    handleError("Impossible de générer le carnet de suivi. ", e, "Vérifiez que votre carnet de suivi a bien été initialisé.");
   }
   
 }
@@ -62,8 +60,8 @@ function generate() {
 * @return {Nothing}
 */
 function add_period(doc, period) {
-  
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(period);
+
+  var sheet = getSheetByName(period);
   
   var body = doc.getBody();
   var index = getScope(body, period);
@@ -149,7 +147,7 @@ function add_period(doc, period) {
 */
 function add_table(doc, period) {
   
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(period);
+  var sheet = getSheetByName(period);
   
   var body = doc.getBody();
   var index = getScope(body, period);
