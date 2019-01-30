@@ -5,7 +5,6 @@
 * Main initialize function : ask for initialization and call other initializing functions
 */
 function initialize() {
-    
   
   var response = ui.alert("Voulez-vous initialiser tout votre carnet suivi maintenant ?\n" +
                           "Un dossier nommé 'Carnet de suivi DII' sera généré. Dedans :\n" +
@@ -14,19 +13,18 @@ function initialize() {
                           ui.ButtonSet.YES_NO);
   
   if (response == ui.Button.YES) {
-    
-    
+        
     try {
+      sendClickEvent();
+      
       setInFolder();
       initGsheets();
       downloadGdocsTemplate();
       ui.alert("Carnet de suivi initialisé ! Vous pouvez maintenant tester la génération du carnet de suivi dans :\n" +
                "\"Modules complémentaires > Carnet de suivi DII Polytech > Générer\"");
       
-      sendUxClickGaEvent("initialize()");
     } catch (e) {
-      sendUxClickGaEvent("initialize()", JSON.stringify(e));
-      ui.alert('Impossible d\'initialiser le carnet de suivi. ' + ERROR_REPORT);
+      handleError(e, true, "Impossible d\'initialiser le carnet de suivi.");
     }
     
   }

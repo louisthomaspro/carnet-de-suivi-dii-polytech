@@ -7,7 +7,7 @@
  * @param info {String} other info that may be added
  */
 function sendClickEvent(info) {
-  sendEvent({ collection : "Event", desc : { action : "click", label : getCaller(), extra : info } });
+  sendEvent({ collection : "Event", desc : { action : "click", label : getCaller(), extra : (info == null ? "" : info) } });
 }
 
 
@@ -16,8 +16,8 @@ function sendClickEvent(info) {
  *
  * @param e {Error} error from the try catch
  */
-function sendErrorEvent(e) {
-  sendEvent({ collection : "Error", desc : e });
+function sendErrorEvent(e, knownError) {
+  sendEvent({ collection : "Error", desc : e , knownError : knownError});
 }
 
 
@@ -28,8 +28,9 @@ function sendErrorEvent(e) {
  * @param e {String} (optional) error 
  */
 function sendEvent(json) {
-  
+   
   try {
+    
     const data = {
       "user": Session.getTemporaryActiveUserKey(),
       "desc" : json.desc,
@@ -38,11 +39,14 @@ function sendEvent(json) {
     var firestore = getDatabase();
     firestore.createDocument(json.collection, data);
     console.info(data);
+    
+    if (json.collection == "Event") sendUxClickGaEvent(json);
+    
   } catch (e) {
-    console.error(JSON.stringify(e));
+    console.error("Error in sendEvent() : " + JSON.stirngify(e));
   }
   
-  if (json.collection == "Event") sendUxClickGaEvent(json);
+  
 }
 
 
@@ -67,4 +71,5 @@ function sendUxClickGaEvent(json) {
   UrlFetchApp.fetch('https://www.google-analytics.com/collect', options);
   
   console.info("GA : " + JSON.stringify(options));
+  
 }

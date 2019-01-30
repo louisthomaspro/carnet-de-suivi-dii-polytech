@@ -5,9 +5,9 @@
 * Show sidebar with skills
 */
 function showSkillsSidebar() {
-  sendClickEvent();
   
   try {
+    sendClickEvent();
     
     // First we get all skills with their occurences
     var sheet = getSheetByName('company');
@@ -33,7 +33,7 @@ function showSkillsSidebar() {
     ui.showSidebar(htmlOutput);
 
   } catch (e) {
-    handleError("Impossible d\'afficher les compétences. ", e, "Vérifiez que votre carnet de suivi a bien été initialisé. ");
+    handleError(e, true, "Impossible d\'afficher les compétences.", "Vérifiez que votre carnet de suivi a bien été initialisé.");
   }
 }
 
@@ -41,9 +41,9 @@ function showSkillsSidebar() {
 * Action on click for buttons in side bar : we append the skill in the selected cell
 */
 function addSkillInSelectedCells(text) {
-  sendClickEvent(text);
   
   try {
+    sendClickEvent(text);
     
     var range = SpreadsheetApp.getActive().getActiveRange(); // Get selected range
     // For each cell in selected range
@@ -61,7 +61,7 @@ function addSkillInSelectedCells(text) {
     }
     
   } catch (e) {
-    handleError("Impossible d'ajouter la compétence. ", e, "");
+    handleError(e, true, "Impossible d'ajouter la compétence.");
   }
   
   

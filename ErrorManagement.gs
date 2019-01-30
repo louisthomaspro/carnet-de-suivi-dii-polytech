@@ -18,36 +18,45 @@ function customError(msg) {
 /**
  * Handle an error by displaying the good message
  *
- * @param begin_msg {String} the begin of the message (ex : an error happened)
  * @param e {Error} Error of the catch function
+ * @param display {boolean} display error in an alertbox
+ * @param begin_msg {String} the begin of the message (ex : an error happened)
  * @param fallback_msg {String} (optional) if the error is unknown, we can set a default message
  */
-function handleError(begin_msg, e, fallback_msg) {
-  
-  var ERROR_REPORT = '\nSi le problème persiste, merci de reporter l\'erreur dans "Carnet de suivi DII Polytech > Help > Report an issue".';
-  var report_issue = false;
-  
-  var err_msg = begin_msg;
-  
-  if (isJson(e.message) && JSON.parse(e.message).custom == true) { // si c'est une erreur connu
-    err_msg += JSON.parse(e.message).msg;
-  } else {
-    if (fallback_msg !== undefined) err_msg += " " + fallback_msg // default message
-    report_issue = true;
-  }
-  
-  if (report_issue !== undefined) { // si définie
-    if (report_issue) { // si true
-      err_msg += ERROR_REPORT;
+function handleError(e, display /*false*/, what_happened, trivial_solution) {
+ 
+  try {
+    var knownError = false;
+    var report_issue = false; // we suggest to report an issue only if the error is unknown
+    
+    var err_msg = what_happened;
+    
+    if (display == undefined) {
+      display = false;
     }
-  } else { // par défaut on affiche le REPORT
-    err_msg += ERROR_REPORT;
+    
+    if (isJson(e.message) && JSON.parse(e.message).custom == true) { // if we known the error
+      var customErrorMsg = JSON.parse(e.message).msg;
+      err_msg += " " + customErrorMsg;
+      e.message = customErrorMsg; // set the real error message for the event after
+      knownError = true;
+    }
+    
+    err_msg += " " + trivial_solution;
+    err_msg += '\n\nSi le problème persiste, merci de reporter l\'erreur dans "Carnet de suivi DII Polytech > Help > Report an issue".';
+    
+    if (knownError) {
+      console.info(JSON.stringify(e));
+    } else {
+      console.warn(JSON.stringify(e));
+    }
+    
+    if (display) ui.alert(err_msg);
+    
+  } catch (e) {
+    
+    console.error("Error in handleError() : " + JSON.stringify(e)); // A tester
+    
   }
-  
-  
-//  sendUxClickGaEvent(getCaller(), JSON.stringify(e.stack)); // a changer
-  console.error(JSON.stringify(e));
-  sendEvent({ type : "error" }, e);
-  ui.alert(err_msg);
   
 }

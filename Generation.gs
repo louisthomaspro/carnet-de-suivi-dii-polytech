@@ -10,9 +10,9 @@
 * Generate the tracking book
 */
 function generate() {
-  sendClickEvent();
    
   try {
+    sendClickEvent();
     
     var folder = getFolderOfFileId(SpreadsheetApp.getActiveSpreadsheet().getId()); // get parent folder of the spreadsheet
     var template = getFileByNameInFolder('_template', folder); // get Gdocs '_template'
@@ -45,7 +45,7 @@ function generate() {
     ui.showModalDialog(htmlOutput, 'Carnet de suivi généré !');
     
   } catch (e) {
-    handleError("Impossible de générer le carnet de suivi. ", e, "Vérifiez que votre carnet de suivi a bien été initialisé.");
+    handleError(e, true, "Impossible de générer le carnet de suivi.", "Vérifiez que votre carnet de suivi a bien été initialisé.");
   }
   
 }
@@ -61,10 +61,12 @@ function generate() {
 */
 function add_period(doc, period) {
 
-  var sheet = getSheetByName(period);
+  var index = getScope(doc, period);
+  if (index == -1) return; // if scope not found, stop
   
+  var sheet = getSheetByName(period);
   var body = doc.getBody();
-  var index = getScope(body, period);
+  
   var numRows = sheet.getLastRow(); // get number of rows not empty except header
   var tablerow;
   var table;
@@ -147,10 +149,12 @@ function add_period(doc, period) {
 */
 function add_table(doc, period) {
   
-  var sheet = getSheetByName(period);
+  var index = getScope(doc, period);
+  if (index == -1) return; // if scope not found, stop
   
+  var sheet = getSheetByName(period);
   var body = doc.getBody();
-  var index = getScope(body, period);
+  
   var numRows = sheet.getLastRow();
   var table = body.insertTable(index);
   

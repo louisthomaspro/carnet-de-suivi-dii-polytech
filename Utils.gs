@@ -4,6 +4,8 @@
 ///////////////////////////// SHORT FONCTIONS /////////////////////////////
 
 
+
+
 /**
  * Return the function name of the caller
  *
@@ -113,10 +115,13 @@ function deleteFilesByNameInFolder(name, folder) {
  * @param name {string} : name of the scope
  * @return {int}
  */
-function getScope(body, name) {
-  var rangeElement = body.findText("{{" + name + "}}"); // find scope
+function getScope(doc, name) {
+  var body = doc.getBody();
+  var scope = "{{" + name + "}}";
+  var rangeElement = body.findText(scope); // find scope
   if (!rangeElement) {
-    return 0;
+    console.warn('Le scope "' + scope + '" est introuvable dans le document "' + doc.getName() + '".');
+    return -1;
   }
   var element = rangeElement.getElement();
   var parent = element.getParent(); // get parents
