@@ -51,7 +51,7 @@ function handleError(e, display /*false*/, what_happened, trivial_solution) {
       console.warn(JSON.stringify(e));
     }
     
-    if (display) ui.alert(err_msg);
+    if (display) SpreadsheetApp.getUi().alert(err_msg);
     
   } catch (e) {
     

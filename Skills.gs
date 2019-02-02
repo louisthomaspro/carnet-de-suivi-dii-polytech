@@ -7,7 +7,7 @@
 function showSkillsSidebar() {
   
   try {
-    sendClickEvent();
+    sendClickEvent("showSkillsSidebar()");
     
     // First we get all skills with their occurences
     var sheet = getSheetByName('company');
@@ -30,7 +30,7 @@ function showSkillsSidebar() {
     var htmlTemplate = HtmlService.createTemplateFromFile('SkillsSidebar')
     htmlTemplate.dataFromServerTemplate = { skills: skills };
     var htmlOutput = htmlTemplate.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME).setTitle('Compétences').setWidth(300);
-    ui.showSidebar(htmlOutput);
+    SpreadsheetApp.getUi().showSidebar(htmlOutput);
 
   } catch (e) {
     handleError(e, true, "Impossible d\'afficher les compétences.", "Vérifiez que votre carnet de suivi a bien été initialisé.");
@@ -43,7 +43,7 @@ function showSkillsSidebar() {
 function addSkillInSelectedCells(text) {
   
   try {
-    sendClickEvent(text);
+    sendClickEvent("addSkillInSelectedCells()", text);
     
     var range = SpreadsheetApp.getActive().getActiveRange(); // Get selected range
     // For each cell in selected range

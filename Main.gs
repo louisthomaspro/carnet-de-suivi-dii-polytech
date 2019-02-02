@@ -23,11 +23,8 @@ var SHEET_SOURCE = '1WPh-suzqGs0-yr6TLgcCdhJ6qB_R6T9LzXF7-4qLtec'; // https://do
 var DOC_SOURCE = '1Y-wco8Hti8Fn3BlYzhK4CxvN7-tx_J3HjPRF-RoEZQM'; // https://docs.google.com/document/d/1Y-wco8Hti8Fn3BlYzhK4CxvN7-tx_J3HjPRF-RoEZQM/edit
 var TABLE_SOURCE = '1j_WQbZ0p0nSnbF1d-VtYtKxmn6R0LIL7KohZY9-b4XE'; // https://docs.google.com/document/d/1j_WQbZ0p0nSnbF1d-VtYtKxmn6R0LIL7KohZY9-b4XE/edit
 
-
-var ui = SpreadsheetApp.getUi();
-var documentProperties = PropertiesService.getDocumentProperties();
-var scriptProperties = PropertiesService.getScriptProperties();
-var userProperties = PropertiesService.getUserProperties();
+var FIREBASE_AUTH = 'FIREBASE_AUTH';
+var GA_TRACKING_ID = 'GA_TRACKING_ID';
 
 /******************************/
 
@@ -44,7 +41,7 @@ function onInstall() {
 
 // When the Gsheet has just been opened
 function onOpen() {
-  ui
+  SpreadsheetApp.getUi()
   .createAddonMenu() // Add a new option in the Google Sheets Add-ons Menu
   .addItem("Générer", 'generate')
   .addItem('Afficher les compétences', 'showSkillsSidebar')

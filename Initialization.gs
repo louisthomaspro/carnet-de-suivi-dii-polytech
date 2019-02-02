@@ -6,6 +6,8 @@
 */
 function initialize() {
   
+  var ui = SpreadsheetApp.getUi();
+  
   var response = ui.alert("Voulez-vous initialiser tout votre carnet suivi maintenant ?\n" +
                           "Un dossier nommé 'Carnet de suivi DII' sera généré. Dedans :\n" +
                           "- Ce Google Sheets sera initialisé\n" +
@@ -15,7 +17,7 @@ function initialize() {
   if (response == ui.Button.YES) {
         
     try {
-      sendClickEvent();
+      sendClickEvent("initialize()");
       
       setInFolder();
       initGsheets();

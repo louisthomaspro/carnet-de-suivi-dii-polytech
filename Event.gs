@@ -6,8 +6,8 @@
  *
  * @param info {String} other info that may be added
  */
-function sendClickEvent(info) {
-  sendEvent({ collection : "Event", desc : { action : "click", label : getCaller(), extra : (info == null ? "" : info) } });
+function sendClickEvent(label, info) {
+  sendEvent({ collection : "Event", desc : { action : "click", label : label, extra : (info == null ? "" : info) } });
 }
 
 
@@ -43,7 +43,7 @@ function sendEvent(json) {
     if (json.collection == "Event") sendUxClickGaEvent(json);
     
   } catch (e) {
-    console.error("Error in sendEvent() : " + JSON.stirngify(e));
+    console.error("Error in sendEvent() : " + JSON.stringify(e));
   }
   
   
@@ -57,7 +57,7 @@ function sendEvent(json) {
  */
 function sendUxClickGaEvent(json) {
   var v = "1";
-  var tid = scriptProperties.getProperty("GA_TRACKING_ID"); // tracking id
+  var tid = PropertiesService.getScriptProperties().getProperty(GA_TRACKING_ID); // tracking id
   var cid = Session.getTemporaryActiveUserKey(); // anonymous user
   var t = "event"; // event
   var ec = "UX"; // event category

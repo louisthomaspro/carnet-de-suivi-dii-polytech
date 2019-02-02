@@ -7,6 +7,7 @@
 
 
 /**
+ * (deprecated in production)
  * Return the function name of the caller
  *
  * @param n {String} n th parent. (ex : n=1 will be the function where getCaller is called)
