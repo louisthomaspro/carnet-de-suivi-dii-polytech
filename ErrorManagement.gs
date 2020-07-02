@@ -43,7 +43,7 @@ function handleError(e, display /*false*/, what_happened, trivial_solution) {
     }
     
     err_msg += " " + trivial_solution;
-    err_msg += '\n\nSi le problème persiste, merci de reporter l\'erreur dans "Carnet de suivi DII Polytech > Help > Report an issue".';
+    err_msg += '\n\nSi le problème persiste, merci de reporter l\'erreur dans "Carnet de suivi DII Polytech > Aide".';
     
     if (knownError) {
       console.info(JSON.stringify(e));

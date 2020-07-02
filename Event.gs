@@ -36,8 +36,6 @@ function sendEvent(json) {
       "desc" : json.desc,
       "date" : new Date()
     }
-    var firestore = getDatabase();
-    firestore.createDocument(json.collection, data);
     console.info(data);
     
     if (json.collection == "Event") sendUxClickGaEvent(json);
@@ -57,7 +55,7 @@ function sendEvent(json) {
  */
 function sendUxClickGaEvent(json) {
   var v = "1";
-  var tid = PropertiesService.getScriptProperties().getProperty(GA_TRACKING_ID); // tracking id
+  var tid = GA_TRACKING_ID; // tracking id
   var cid = Session.getTemporaryActiveUserKey(); // anonymous user
   var t = "event"; // event
   var ec = "UX"; // event category

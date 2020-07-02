@@ -13,7 +13,7 @@
 //                                                                                         
 //                                                                                                                     
 //  by louisthomas.pro
-//  contact : louis.thomas-2@etu.univ-tours.fr
+//  contact : https://louisthomas.pro/
 //  project : https://gitlab.com/louisthomaspro/carnet-de-suivi-dii.git
 
 
@@ -23,8 +23,7 @@ var SHEET_SOURCE = '1WPh-suzqGs0-yr6TLgcCdhJ6qB_R6T9LzXF7-4qLtec'; // https://do
 var DOC_SOURCE = '1Y-wco8Hti8Fn3BlYzhK4CxvN7-tx_J3HjPRF-RoEZQM'; // https://docs.google.com/document/d/1Y-wco8Hti8Fn3BlYzhK4CxvN7-tx_J3HjPRF-RoEZQM/edit
 var TABLE_SOURCE = '1j_WQbZ0p0nSnbF1d-VtYtKxmn6R0LIL7KohZY9-b4XE'; // https://docs.google.com/document/d/1j_WQbZ0p0nSnbF1d-VtYtKxmn6R0LIL7KohZY9-b4XE/edit
 
-var FIREBASE_AUTH = 'FIREBASE_AUTH';
-var GA_TRACKING_ID = 'GA_TRACKING_ID';
+var GA_TRACKING_ID = 'UA-93751383-4';
 
 /******************************/
 
@@ -34,19 +33,16 @@ var GA_TRACKING_ID = 'GA_TRACKING_ID';
 
 /********** EVENTS **********/
 
-// When user just installed the module
-function onInstall() {
-  onOpen();
-}
-
 // When the Gsheet has just been opened
 function onOpen() {
   SpreadsheetApp.getUi()
-  .createAddonMenu() // Add a new option in the Google Sheets Add-ons Menu
+  .createMenu('Carnet de suivi DII Polytech') // Add a new option in the Google Sheets Add-ons Menu
   .addItem("Générer", 'generate')
   .addItem('Afficher les compétences', 'showSkillsSidebar')
   .addSeparator()
   .addItem("Intialiser", 'initialize')
+  .addSeparator()
+  .addItem("Aide", 'help')
   .addToUi();
   
 }

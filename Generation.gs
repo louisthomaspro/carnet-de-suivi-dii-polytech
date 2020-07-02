@@ -158,20 +158,22 @@ function add_table(doc, period) {
   var numRows = sheet.getLastRow();
   var table = body.insertTable(index);
   
-  var row = sheet.getRange(1, 1, 1, 2).getValues()[0]; // row, column, numrows, numcolumns
+  var row = sheet.getRange(1, 1, 1, 3).getValues()[0]; // row, column, numrows, numcolumns
   
   var tr = table.appendTableRow().setBold(true);
   tr.appendTableCell(row[0]).setWidth(120).setBackgroundColor("#efefef");
-  tr.appendTableCell(row[1]).setWidth(330).setBackgroundColor("#efefef");
+  tr.appendTableCell(row[1]).setWidth(270).setBackgroundColor("#efefef");
+  tr.appendTableCell(row[2]).setWidth(60).setBackgroundColor("#efefef");
   
   
   for (var i = 2; i <= numRows; i++) { // for each row, add values to table
     
-    var row = sheet.getRange(i, 1, 1, 2).getValues()[0]; // row, column, numrows, numcolumns
+    var row = sheet.getRange(i, 1, 1, 3).getValues()[0]; // row, column, numrows, numcolumns
     
     var tablerow = table.appendTableRow().setBold(false);
     tablerow.appendTableCell(row[0]);
     tablerow.appendTableCell(row[1]);
+    tablerow.appendTableCell(row[2]);
     
   }
   
