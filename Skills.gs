@@ -12,12 +12,20 @@ function showSkillsSidebar() {
     // First we get all skills with their occurences
     var sheet = getSheetByName('company');
     var rows = sheet.getRange("E2:E").getValues(); // get all skills already added
-    var filter_rows = [i for each (i in rows)if (isNaN(i))]; // remove empty values
+    var filter_rows = rows; // remove empty values
+    for (var i_row in filter_rows) {
+      Logger.log(filter_rows[i_row][0]);
+      if (!filter_rows[i_row][0]) {
+        delete filter_rows[i_row];
+      }
+    }
     var skills = new Object(); // will contain all skills with their occurences
-    for each (var row in filter_rows)
+    for (var i_row in filter_rows)
     {
+      var row = filter_rows[i_row];
       var splits = row.toString().split("\n"); // split with "newline"
-      for each (var split in splits) { // for each skill in the row
+      for (var i_split in splits) { // for each skill in the row
+        var split = splits[i_split];
         if (split in skills) { // if it's not the first time we have this skill
           skills[split]++; // add where the key is equal to skill
         } else {
