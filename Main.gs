@@ -1,5 +1,4 @@
-// Code.gs
-
+// Main.gs
 
 
 // http://patorjk.com/software/taag/#p=display&f=Big&t=Carnet%20de%20suivi%20DII
@@ -13,17 +12,20 @@
 //                                                                                         
 //                                                                                                                     
 //  by louisthomas.pro
-//  contact : https://louisthomas.pro/
+//  contact : louisthomas.pro@gmail.com
 //  project : https://gitlab.com/louisthomaspro/carnet-de-suivi-dii.git
 
 
 /********** CONSTANTS **********/
 
-var SHEET_SOURCE = '1WPh-suzqGs0-yr6TLgcCdhJ6qB_R6T9LzXF7-4qLtec'; // https://docs.google.com/spreadsheets/d/1WPh-suzqGs0-yr6TLgcCdhJ6qB_R6T9LzXF7-4qLtec/edit
-var DOC_SOURCE = '1Y-wco8Hti8Fn3BlYzhK4CxvN7-tx_J3HjPRF-RoEZQM'; // https://docs.google.com/document/d/1Y-wco8Hti8Fn3BlYzhK4CxvN7-tx_J3HjPRF-RoEZQM/edit
-var TABLE_SOURCE = '1j_WQbZ0p0nSnbF1d-VtYtKxmn6R0LIL7KohZY9-b4XE'; // https://docs.google.com/document/d/1j_WQbZ0p0nSnbF1d-VtYtKxmn6R0LIL7KohZY9-b4XE/edit
-
-var GA_TRACKING_ID = 'UA-93751383-4';
+// DO NOT CHANGE THIS !!!
+var CONSTANTS = {
+  version: "1.2.0",
+  files: {
+    template: '1SKabJkPDKdWfKwGBJrqdd9bJe_yr50DatJJ6wPH8upQ',
+    table: '18FDN1lCA1RRYVE8JMBIOBuzQaJK8y6tYKsCl58opfyI'
+  }
+}
 
 /******************************/
 
@@ -33,7 +35,9 @@ var GA_TRACKING_ID = 'UA-93751383-4';
 
 /********** EVENTS **********/
 
-// When the Gsheet has just been opened
+/**
+ * When document was opened, we create the user menu
+ */
 function onOpen() {
   SpreadsheetApp.getUi()
   .createMenu('Carnet de suivi DII Polytech') // Add a new option in the Google Sheets Add-ons Menu
@@ -42,13 +46,33 @@ function onOpen() {
   .addSeparator()
   .addItem("Intialiser", 'initialize')
   .addSeparator()
+  .addItem("Notifications", 'handleNotifications')
   .addItem("Aide", 'help')
   .addToUi();
-  
+}
+
+
+/**
+ * [Trigger configuration] When the Gsheet has just been edited
+ * We send an event every 10min to analyse user activity
+ */
+function editTrigger() {
+  if (!CacheService.getScriptCache().get("edit")) {
+    CacheService.getScriptCache().put("edit", true, 600) // 10min
+    sendEvent("edit", {});
+  }
+}
+
+
+/**
+ * [Triggerconfiguration] When the Gsheet has just been opened
+ * To show user notification
+ */
+function openTrigger() {
+  handleNotifications();
 }
 
 /******************************/
-
 
 
 

@@ -2,72 +2,32 @@
 
 
 /**
- * Call sendEvent function with a json parameter including clicking information
+ * Send anonymous information to database for analytics
  *
- * @param info {String} other info that may be added
+ * @param action {String} ex: click, notification, open...
+ * @param data {String} useful data
+ * @param e {Error} error if exist
  */
-function sendClickEvent(label, info) {
-  sendEvent({ collection : "Event", desc : { action : "click", label : label, extra : (info == null ? "" : info) } });
-}
-
-
-/**
- * Call sendEvent function with and error in parameter
- *
- * @param e {Error} error from the try catch
- */
-function sendErrorEvent(e, knownError) {
-  sendEvent({ collection : "Error", desc : e , knownError : knownError});
-}
-
-
-/**
- * Send information to google analytics and firestore
- *
- * @param json {String} json with information about the event
- * @param e {String} (optional) error 
- */
-function sendEvent(json) {
-   
-  try {
-    
-    const data = {
-      "user": Session.getTemporaryActiveUserKey(),
-      "desc" : json.desc,
-      "date" : new Date()
-    }
-    console.info(data);
-    
-    if (json.collection == "Event") sendUxClickGaEvent(json);
-    
-  } catch (e) {
-    console.error("Error in sendEvent() : " + JSON.stringify(e));
+function sendEvent(action, data, e) {
+  
+  // Get datetime
+  var timezone = "GMT+" + new Date().getTimezoneOffset()/60
+  var datetime = Utilities.formatDate(new Date(), timezone, "dd-MM-yyyy'T'HH:mm:ss'Z'");
+  
+  var error = (e == undefined) ? false : { "stack": e.stack }; // if error exist, get error info
+  
+  var document = {
+    "datetime": datetime,
+    "user": {
+      "sha512_email": sha512(Session.getActiveUser().getEmail()), // hash user email => RGPD friendly :)
+      "userKey": Session.getTemporaryActiveUserKey() // unique key every 30 days
+    },
+    "action": action,
+    "data": data,
+    "version": CONSTANTS.version,
+    "error": error
   }
-  
-  
-}
+  var firestore = getDatabase();
+  firestore.createDocument("events", document);
 
-
-/**
- * Send an user click event to google analytics
- *
- * @param label {String} label of the events
- */
-function sendUxClickGaEvent(json) {
-  var v = "1";
-  var tid = GA_TRACKING_ID; // tracking id
-  var cid = Session.getTemporaryActiveUserKey(); // anonymous user
-  var t = "event"; // event
-  var ec = "UX"; // event category
-  var ea = json.desc.action; // event action
-  var el = lengthInUtf8Bytes(json.desc.label) <= 500 ? encodeURIComponent(json.desc.label) : encodeURIComponent("label too big");
-  
-  var options = {
-    'method' : 'POST',
-    'payload' : 'v=' + v + '&tid=' + tid + '&cid=' + cid + '&t=' + t + '&ec=' + ec + '&ea=' + ea + '&el=' + el
-  };
-  UrlFetchApp.fetch('https://www.google-analytics.com/collect', options);
-  
-  console.info("GA : " + JSON.stringify(options));
-  
 }

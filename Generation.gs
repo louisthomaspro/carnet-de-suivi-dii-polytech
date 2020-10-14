@@ -12,13 +12,11 @@
 function generate() {
    
   try {
-    sendClickEvent("generate()");
     
     var folder = getFolderOfFileId(SpreadsheetApp.getActiveSpreadsheet().getId()); // get parent folder of the spreadsheet
     var template = getFileByNameInFolder('_template', folder); // get Gdocs '_template'
     
     var ts_begin = new Date().getTime(); // Number of ms since Jan 1, 1970
-    CacheService.getUserCache().put('ts_begin', JSON.stringify(ts_begin));
     
     deleteFilesByNameInFolder('_generated', folder); // delete all Gdocs '_generated' existing
     
@@ -29,23 +27,24 @@ function generate() {
     // Replace scopes
     add_period(generated, "school");
     add_period(generated, "company");
-    add_table(generated, "end_of_course");
     
     
     // Calculation of the execution time of the function
-    var ts_begin = getJsonCache('ts_begin');
     var ts_end = new Date().getTime();
-    var time = (ts_end - ts_begin) / 1000;
+    var duration_ms = ts_end - ts_begin
+    var duration_s = duration_ms / 1000;
     
     var htmlOutput = HtmlService
     .createHtmlOutput('Lien du fichier : <a target="_blank" href="https://docs.google.com/document/d/' + file.getId() + '/edit">\'_generated\'</a>' +
-      '<br><span style="font-size:12px;color:#797979;">Time : ' + JSON.stringify(time) + 's</span>')
+      '<br><span style="font-size:12px;color:#797979;">Time : ' + JSON.stringify(duration_s) + 's</span>')
       .setWidth(250)
       .setHeight(50);
+    sendEvent("click", { "function": "generate()", "duration_ms": duration_ms });
     SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Carnet de suivi généré !');
     
   } catch (e) {
-    handleError(e, true, "Impossible de générer le carnet de suivi.", "Vérifiez que votre carnet de suivi a bien été initialisé.");
+    sendEvent("click", { "function": "generate()" }, e);
+    return handleError(e, "Impossible de générer le carnet de suivi. Vérifiez que votre carnet de suivi a bien été initialisé.");
   }
   
 }
@@ -64,10 +63,10 @@ function add_period(doc, period) {
   var index = getScope(doc, period);
   if (index == -1) return; // if scope not found, stop
   
-  var sheet = getSheetByName(period);
+  var sheet_period = getSheetByName(period);
   var body = doc.getBody();
   
-  var numRows = sheet.getLastRow(); // get number of rows not empty except header
+  var num_rows_period = sheet_period.getLastRow(); // get number of rows not empty except header
   var tablerow;
   var table;
   var synthese; // paragraph header of synthese
@@ -77,12 +76,31 @@ function add_period(doc, period) {
   var fusionTableHeader = getFusionTableHeader(); // get table gdoc (template) with fusion for the table header
   var new_week = false;
   
-  var rows = sheet.getRange(2,1,numRows-1, 5).getValues(); // get all info at one time
+  var rows_period = sheet_period.getRange(2,1,num_rows_period-1, 5).getValues(); // get all info at one time
+  var json_end_of_course = {};
   
-  
-  for (var i = rows.length - 1; i >= 0; i--) { // for each row beginning with the end
+  // if period school then get end_of_course data and parse to json to retrieve it easily
+  if (period == "school") {
+    var sheet_end_of_course = getSheetByName("end_of_course");    
+    var num_rows_end_of_couse = sheet_end_of_course.getLastRow();
+    var rows_end_of_course = sheet_end_of_course.getRange(2,1,num_rows_end_of_couse-1, 4).getValues(); // get all info at one time
     
-    row = rows[i]; // get row
+    for (var i in rows_end_of_course) { 
+      if (json_end_of_course[rows_end_of_course[i][0]] == undefined) json_end_of_course[rows_end_of_course[i][0]] = [];
+      json_end_of_course[rows_end_of_course[i][0]].push({
+        "subject": rows_end_of_course[i][1],
+        "comment": rows_end_of_course[i][2],
+        "mark": rows_end_of_course[i][3]
+      });
+    }  
+  }
+ 
+  
+  
+  
+  for (var i = rows_period.length - 1; i >= 0; i--) { // for each row beginning with the end
+    
+    row = rows_period[i]; // get row
     
     // if synthese, update last synthese we saved
     if (i == 0 || row[1] == "Synthèse / Bilan") {
@@ -106,6 +124,29 @@ function add_period(doc, period) {
       if (week_number != row[0]) { // if we changed week we add a new table
         
         week_number = row[0];
+        
+        body.insertPageBreak(index);
+        
+        
+        // add end of course
+        if (week_number in json_end_of_course) {
+          
+          // Create and configure table
+          var table_eoc = body.insertTable(index);
+          table_eoc.setBorderColor('#ffffff');
+          
+          for (var sub in json_end_of_course[week_number]) { // add new row for every subjects
+            var text = table_eoc.appendTableRow().appendTableCell().appendParagraph("").editAsText();
+            text.appendText(json_end_of_course[week_number][sub]["subject"] + " (" + json_end_of_course[week_number][sub]["mark"] + ")\n");
+            var endOffsetInclusive = text.getText().length - 1;
+            text.appendText(json_end_of_course[week_number][sub]["comment"]);
+            text.setBold(0, endOffsetInclusive, true);
+          }
+          body.insertParagraph(index, "Synthèse de fin de cours semaine " + week_number)
+              .setAttributes(body.getHeadingAttributes(DocumentApp.ParagraphHeading.HEADING3)); // apply the heading3 style
+        }
+        
+        
         
         body.insertParagraph(index, "\n");
         table = body.insertTable(index, fusionTableHeader.copy()); // add table

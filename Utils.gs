@@ -5,36 +5,6 @@
 
 
 
-
-/**
- * (deprecated in production)
- * Return the function name of the caller
- *
- * @param n {String} n th parent. (ex : n=1 will be the function where getCaller is called)
- */
-function getCaller(n)
-{
-  var nth = 2; 
-  if (n !== undefined) {
-    nth = nth + n;
-  }
-  var stack;
-  var ret = "";
-    try {
-      throw new Error("Whoops!");
-    } catch (e) {
-      stack = e.stack;
-    } finally {
-      var matchArr = stack.match(/\(.*\)/g);
-      if (matchArr.length > 2) {
-        tmp = matchArr[nth];
-        ret = tmp.slice(1, tmp.length - 1) + "()";
-      }
-      return ret;
-    }
-}
-
-
 /**
  * Return true if the string in parameter can be parsed
  *
@@ -49,17 +19,6 @@ function isJson(str) {
   return true;
 }
 
-
-/**
- * Return the length of the variable after UTF-8 encoding
- *
- * @param str {String} we want to calcul the length of this variable
- */
-function lengthInUtf8Bytes(str) {
-  // Matches only the 10.. bytes that are non-initial characters in a multi-byte sequence.
-  var m = encodeURIComponent(str).match(/%[89ABab]/g);
-  return str.length + (m ? m.length : 0);
-}
 
 
 /**
@@ -86,8 +45,8 @@ function getFolderOfFileId(id) {
 function getFileByNameInFolder(name, folder) {
   var files = folder.getFilesByName(name); // get all files named 'name' in folder
   if (!files.hasNext()) { // if not found
-    throw new Error(customError('Le fichier nommé "' + name + '" est introuvable dans le dossier "' + folder.getName() + '". ' +
-                    'Pour rappel, ce fichier ne doit pas être renommé ou déplacé. '));
+    throw new Error('Le fichier nommé "' + name + '" est introuvable dans le dossier "' + folder.getName() + '". ' +
+                    'Pour rappel, ce fichier ne doit pas être renommé ou déplacé. ');
   }
   var file = files.next();
   return file
@@ -138,7 +97,7 @@ function getScope(doc, name) {
  * @return {table}
  */
 function getFusionTableHeader() {
-  var file = DocumentApp.openById(TABLE_SOURCE);
+  var file = DocumentApp.openById(CONSTANTS.files.table);
   var body = file.getBody(); // get official table file
   var table = body.getTables()[0]; // this is the orginal table containing merged cells
   return table;
@@ -146,11 +105,31 @@ function getFusionTableHeader() {
 
 
 /**
- * Get variables in cache and return a JSON value
+ * Compare 2 versions
  *
- * @param key {string} Google Sheets api key
- * @return {JSON.parse(string)} Object or string
+ * @return {integer} -1 if < ; 1 if > ; 0 if ==
  */
-function getJsonCache(key) {
-  return JSON.parse(CacheService.getUserCache().get(key));
+function Version(s){
+  this.arr = s.split('.').map(Number);
+}
+Version.prototype.compareTo = function(v){
+  for (var i=0; ;i++) {
+    if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1;
+    if (i>=this.arr.length) return -1;
+    var diff = this.arr[i]-v.arr[i]
+    if (diff) return diff>0 ? 1 : -1;
+  }
+}
+
+
+/**
+ * HASH a message with sha512 algorithm
+ */
+function sha512(message) {
+  var result = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_512, message)
+  result = result.map(function(e) {
+    var v = (e < 0 ? e + 256 : e).toString(16);
+    return v.length == 1 ? "0" + v : v;
+  }).join("");
+  return result;
 }
